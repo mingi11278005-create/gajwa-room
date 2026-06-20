@@ -69,10 +69,11 @@ tab1, tab2, tab3 = st.tabs([
 # [1페이지] 실시간 시세 산정 엔진
 with tab1:
     st.markdown("## 🔮 머신러닝 기반 적정 주거비용 추정")
-    st.write("인공지능 모델이 입력된 면적과 연식을 계산하여 가좌동 표준 시세를 실시간 튜닝합니다.")
+    st.write("왼쪽 사이드바에서 면적과 연식을 변경하면 AI가 실시간으로 적정 가격을 산출합니다.")
     
+    # 🛠️ [에러 해결 지점] 넘파이 배열에서 [0]을 사용하여 단일 숫자 추출로 에러 완벽 차단!
     predicted_arr = model.predict([[user_area, user_age]])
-    predicted_rent = float(predicted_arr)
+    predicted_rent = float(predicted_arr[0])
     
     res_col1, res_col2 = st.columns(2)
     with res_col1:
@@ -103,7 +104,7 @@ with tab2:
         st.plotly_chart(fig_hist, use_container_width=True)
         
     with chart_col2:
-        fig_scatter = px.scatter(df_raw, x="建物나이", y="환산월세", trendline="ols",
+        fig_scatter = px.scatter(df_raw, x="건물나이", y="환산월세", trendline="ols",
                                  title="📉 건물 연식 노후화에 따른 월세 감가상각 추세",
                                  labels={"건물나이": "건물 나이 (년)", "환산월세": "환산월세 (만원)"},
                                  color_discrete_sequence=['purple'])
