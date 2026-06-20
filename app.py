@@ -50,12 +50,13 @@ st.subheader("📊 인공지능(AI) 기반 적정비용 산정 결과")
 # 실시간 예측 연동
 predicted_rent = model.predict([[user_area, user_age]])
 
-# 결과 박스 디자인
-col1, col2 = st.columns()
+# 🛠️ [에러 해결 지점] st.columns 안에 숫자 2를 명확하게 넣어 칸을 나눕니다.
+col1, col2 = st.columns(2)
 with col1:
-    st.success(f"#### 💡 입력 조건에 따른 가좌동 자취방의 적정 환산월세는 **[{predicted_rent:.1f}] 만원**입니다.")
+    st.success(f"#### 💡 입력 조건에 따른 가좌동 자취방의 적정 환산월세는 **[{predicted_rent[0]:.1f}] 만원**입니다.")
 with col2:
-    st.metric(label="예측 환산월세 (보증금 포함 가치)", value=f"{predicted_rent:.1f} 만원")
+    # 대시보드다운 요약 지표 시각화
+    st.metric(label="예측 환산월세 (보증금 포함 가치)", value=f"{predicted_rent[0]:.1f} 만원")
 
 # 6. 실전 의사결정 활용 가이드라인
 st.markdown("### 💡 대학생 주거비 의사결정 가이드")
