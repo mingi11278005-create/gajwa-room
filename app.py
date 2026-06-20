@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px  # 대시보드 전용 인터랙티브 그래프 패키지
+import plotly.express as px
 from sklearn.ensemble import RandomForestRegressor
 
 # 1. 웹 브라우저 탭 및 글로벌 레이아웃 설정
@@ -60,8 +60,9 @@ with tab1:
     st.markdown("## 🔮 인공지능(AI) 기반 적정비용 산정")
     st.write("왼쪽 사이드바에서 면적과 연식을 변경하면 AI가 실시간으로 적정 가격을 산출합니다.")
     
-    # 실시간 예측 연동
-    predicted_rent = model.predict([[user_area, user_age]])
+    # [에러 해결 지점] 예측값 배열에서 첫 번째 숫자 데이터만 명확하게 추출 ([0] 추가)
+    predicted_arr = model.predict([[user_area, user_age]])
+    predicted_rent = float(predicted_arr[0])
     
     # 상단 요약 지표 (Metric Card 디자인 적용)
     col1, col2 = st.columns(2)
@@ -83,7 +84,7 @@ with tab1:
         st.dataframe(df_raw.head(50), use_container_width=True)
 
 # -------------------------------------------------------------------------
-# [2페이지] 코랩에서 성공한 통계 시각화 그래프 구현 (움직이는 차트로 개편)
+# [2페이지] 코랩에서 성공한 통계 시각화 그래프 구현
 # -------------------------------------------------------------------------
 with tab2:
     st.markdown("## 📊 가좌동 원룸 시세 및 트렌드 분석")
@@ -93,17 +94,16 @@ with tab2:
     
     with col_chart1:
         st.markdown("#### 1. 가좌동 원룸 환산월세 분포 현황 (밀도)")
-        # Plotly를 활용해 코랩에서 본 산 모양 분포도를 세련되게 구현
+        # [컬러 에러 수정] 웹 표준 컬러명인 'skyblue'로 정확히 지정
         fig_hist = px.histogram(df_raw, x="환산월세", nbins=20, 
                                 title="환산월세 가격대별 매물 분포",
                                 labels={"환산월세": "환산월세(만원)", "count": "매물 수(건)"},
-                                color_discrete_sequence=['#skyblue'])
+                                color_discrete_sequence=['skyblue'])
         st.plotly_chart(fig_hist, use_container_width=True)
-        st.caption("👉 분석 결과 가좌동 원룸은 32만원 선(구축 및 일반)과 38만원 선(신축 및 오피스텔)의 두 개 구간이 밀집되어 있습니다.")
+        st.caption("👉 분석 결과 가좌동 원룸은 32만원 선(구축 및 일반)과 38만원 선(신축 프리미엄/오피스텔)의 두 개 구간이 밀집되어 있습니다.")
         
     with col_chart2:
         st.markdown("#### 2. 건물 나이가 월세에 미치는 영향 (상관관계)")
-        # 건물 나이가 많아질수록 가격이 떨어지는 트렌드선 차트
         fig_scatter = px.scatter(df_raw, x="건물나이", y="환산월세", trendline="ols",
                                  title="건물 연식과 월세의 반비례 추세선",
                                  labels={"건물나이": "건물 나이(년)", "환산월세": "환산월세(만원)"},
@@ -112,7 +112,7 @@ with tab2:
         st.caption("👉 우하향하는 추세선은 건물 연식(노후화)이 가좌동 월세를 하락시키는 명확한 요인임을 증명합니다.")
 
 # -------------------------------------------------------------------------
-# [3페이지] 평가 기준 점수 저격용 '중간 보고서 요약본' 텍스트 탑재
+# [3페이지] 평가 기준 점수 저격용 문제 분석 및 연구 배경 탑재
 # -------------------------------------------------------------------------
 with tab3:
     st.markdown("## 📋 프로젝트 기획서 및 연구 배경")
@@ -136,11 +136,11 @@ with tab3:
         st.success("### 💡 3. 프로젝트 기대 효과")
         st.markdown("""
         * **학우들의 경제적 피해(바가지 계약) 방지**: 정량적 데이터를 기반으로 학우들이 스스로 매물의 적정 시세를 판단할 수 있는 가이드라인 제공.
-        * **생활 밀착형 전술 및 배포**: 거창한 국가 정책 제안이 아닌, 본 웹 대시보드 링크를 **에브리타임(에타) 게시판 및 학과 단톡방에 공유**하여 동기들의 실질적인 지갑을 지켜주는 현실적인 주거 복지 효과 실현.
+        * **생활 밀착형 전술 및 배포**: 본 웹 대시보드 링크를 에브리타임(에타) 게시판 및 학과 단톡방에 공유하여 동기들의 실질적인 지갑을 지켜주는 현실적인 주거 복지 효과 실현.
         """)
         
         st.info("### 🤖 4. 인공지능 기반 분석 요약")
         st.markdown("""
-        * **수집 데이터**: 국토교통부 실거래 시스템 기반 가좌동 단독/다가구 4개년 **전수 데이터 1,796건** 통합 및 전처리 완료.
-        * **사용 알고리즘**: 데이터 사이언스 핵심 모델인 **Random Forest Regressor**를 활용한 가치 산정 프로세스 구축.
+        * **수집 데이터**: 국토교통부 실거래 시스템 기반 가좌동 단독/다가구 4개년 전수 데이터 1,796건 통합 및 전처리 완료.
+        * **사용 알고리즘**: 데이터 사이언스 핵심 모델인 Random Forest Regressor를 활용한 가치 산정 프로세스 구축.
         """)
